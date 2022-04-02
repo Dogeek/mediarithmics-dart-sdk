@@ -9,7 +9,8 @@ with Dart and Flutter
 ### Basic tracking
 
 ```dart
-import 'package:mediarithmics_sdk:mediarithmics_sdk.dart';
+import 'package:mediarithmics_sdk/mediarithmics_sdk.dart';  // Imports the SDK
+import 'package:mediarithmics_sdk/interfaces.dart';  // Imports the interfaces (UserIdentifier and API responses)
 import 'package:flutter/material.dart';
 
 void main() => runApp(new MyApp());

@@ -102,7 +102,7 @@ class MicsSdk {
   }
 
   Future<Map<String, dynamic>> postActivity(String eventName,
-      {Map<String, dynamic>? properties,
+      {Map<String, dynamic> properties = const {},
       List<UserIdentifier> identifiers = const [],
       bool aggregated = false}) async {
     // Generate the activity based on the parameters provided to the SDK
@@ -116,11 +116,9 @@ class MicsSdk {
     };
     Map<String, dynamic> event = {
       '\$event_name': eventName,
-      '\$ts': ts
+      '\$ts': ts,
+      '\$properties': properties
     };
-    if (properties != null) {
-      event['\$properties'] = properties;
-    }
     activity['\$events'] = [event];
     for (UserIdentifier identifier in identifiers) {
       identifier.formatted.forEach((key, value) {
