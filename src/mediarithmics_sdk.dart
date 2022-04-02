@@ -31,13 +31,16 @@ class MicsSdk {
   }
 
   Future<String?> get advertisingId async {
-    if (triedFetchingAdvertisingId) {
+    if (triedFetchingAdvertisingId && _advertisingId == null) {
       return null;
     }
     if (_advertisingId != null) {
       return _advertisingId;
     }
+    // Try to fetch the advertising id only once, so that the user is not spammed
+    // by consent requests.
     _advertisingId = await AdvertisingId.id(true);
+    triedFetchingAdvertisingId = true;
     return _advertisingId;
   }
 
@@ -101,10 +104,13 @@ class MicsSdk {
     throw 'API call responded with status ${response.statusCode}';
   }
 
-  Future<Map<String, dynamic>> postActivity(String eventName,
+  Future<UserActivityResource> postActivity(String eventName,
       {Map<String, dynamic> properties = const {},
       List<UserIdentifier> identifiers = const [],
       bool aggregated = false}) async {
+    if (identifiers.isEmpty && advertisingId == null) {
+      throw 'No identifiers provided for this activity, and not advertising ID found.';
+    }
     // Generate the activity based on the parameters provided to the SDK
     int ts = DateTime.now().millisecondsSinceEpoch;
     Map<String, dynamic> activity = {
@@ -129,14 +135,39 @@ class MicsSdk {
     http.Response response =
         await _post('datamarts/$datamartId/user_activities', body: activity);
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return UserActivityResource.fromJSON(jsonDecode(response.body));
     }
     throw 'API call responded with status ${response.statusCode}';
   }
 
-  Future<Map<String, dynamic>> postAppOpen(
-      {Map<String, dynamic> properties = const {}}) async {
-    return await postActivity('\$app_open', properties: properties);
+  Future<UserActivityResource> postAppOpen(
+      {Map<String, dynamic> properties = const {},
+      List<UserIdentifier> identifiers = const []}) async {
+    return await postActivity('\$app_open',
+        properties: properties, identifiers: identifiers);
+  }
+
+  Future<UserActivityResource> postSetUserProfileProperties(
+      Map<String, dynamic> properties,
+      {List<UserIdentifier> identifiers = const []}) async {
+    return await postActivity('\$set_user_profile_properties',
+        properties: properties, identifiers: identifiers);
+  }
+
+  Future<UserActivityResource> postSetUserChoices(
+      {required String processingId,
+      required bool choiceAcceptanceValue,
+      String? choiceSourceToken,
+      List<UserIdentifier> identifiers = const []}) async {
+    Map<String, dynamic> properties = {
+      '\$processing_id': processingId,
+      '\$choice_acceptance_value': choiceAcceptanceValue,
+    };
+    if (choiceSourceToken != null) {
+      properties['\$choice_source_token'] = choiceSourceToken;
+    }
+    return await postActivity('\$set_user_choices',
+        properties: properties, identifiers: identifiers);
   }
 
   MicsSdk._internal();
