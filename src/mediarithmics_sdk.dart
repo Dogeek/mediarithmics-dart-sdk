@@ -41,7 +41,7 @@ class MicsSdk {
     return _advertisingId;
   }
 
-  Map<String, String> makeHeaders(String uri, {Map<String, dynamic>? body}) {
+  Map<String, String> _makeHeaders(String uri, {Map<String, dynamic>? body}) {
     int ts = DateTime.now().millisecondsSinceEpoch;
     String encodedBody = body != null ? jsonEncode(body) : '';
     String message = '$uri\n$keyId\n$ts\n$encodedBody';
@@ -59,13 +59,13 @@ class MicsSdk {
 
   Future<http.Response> _get(String uri) async {
     Uri fullUri = Uri.parse('$domain/$apiVersion/$uri');
-    Map<String, String> headers = makeHeaders(uri);
+    Map<String, String> headers = _makeHeaders(uri);
     return await http.get(fullUri, headers: headers);
   }
 
   Future<http.Response> _post(String uri, {Map<String, dynamic>? body}) async {
     Uri fullUri = Uri.parse('$domain/$apiVersion/$uri');
-    Map<String, String> headers = makeHeaders(uri, body: body);
+    Map<String, String> headers = _makeHeaders(uri, body: body);
     return await http.post(fullUri, headers: headers, body: body);
   }
 
