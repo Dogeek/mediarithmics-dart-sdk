@@ -1,0 +1,14 @@
+name: mediarithmics_sdk
+description: Dart SDK to track mobile apps using mediarithmics.com
+version: 1.0.0
+homepage: https://www.mediarithmics.com
+
+environment:
+  sdk: '>=2.16.2 <3.0.0'
+
+dev_dependencies:
+  lints: ^1.0.0
+dependencies:
+  advertising_id: ^2.2.0
+  crypto: ^3.0.1
+  http: ^0.13.4
