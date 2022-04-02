@@ -135,7 +135,7 @@ class MicsSdk {
   }
 
   Future<Map<String, dynamic>> postAppOpen(
-      {Map<String, dynamic>? properties}) async {
+      {Map<String, dynamic> properties = const {}}) async {
     return await postActivity('\$app_open', properties: properties);
   }
 
